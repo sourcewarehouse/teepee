@@ -1,0 +1,81 @@
+#macro( printItems $items )
+    #foreach( $item in $items )
+        #printItem( $item )
+    #end
+#end
+#macro( printItem $item )
+    #if( $item.type == "PROJECT" )
+        #printProject( $item )
+    #elseif( $item.type == "NOTE" )
+        #printNote( $item )
+    #else
+        #printTask( $item )
+    #end
+#end
+#macro( printProject $project )
+<section class="project">
+    <h2>$project.content</h2>
+    #foreach( $item in $project.items )
+        #printItem( $item )
+    #end
+</section>
+#end
+#macro( printNote $note )
+<div class="note">
+    <p>$note.content</p>
+</div>
+#end
+#macro( printTask $task )
+<div class="task">
+    <p #if( $task.done ) class="done"#end>
+        <i class="#if( $task.done )icon-tick #else icon-minus #end #if( $task.isOverdue() || $task.isDueToday() || $task.isDueTomorrow() )icon-white#end"></i>
+        $task.content
+        #if( $task.dueDate && !$task.isOverdue && !$task.isDueToday() && !$task.isDueTomorrow()) <span class="due-date label">Due: $date.format('dd MMM yyyy', $task.dueDate)</span>#end
+    </p>
+    #if( $item.hasItems() )
+        #foreach( $childItem in $task.items )
+            #printItem( $childItem )
+        #end
+    #end
+</div>
+#end
+
+#parse( "header.vm" )
+        <div class="page-header">
+            <h1>$key</h1>
+        </div>
+
+        #if( $tasks )
+
+            #if( $tasks.hasOverdue() )
+                <section class="overdue alert alert-error">
+                    <h2>Overdue</h2>
+                    #printItems( $tasks.overdue )
+                </section>
+            #end
+
+            #if( $tasks.hasToday() )
+                <section class="today alert alert-success">
+                    <h2>Today</h2>
+                    #printItems( $tasks.today )
+                </section>
+            #end
+
+            #if ( $tasks.hasTomorrow() )
+                <section class="tomorrow alert alert-info">
+                    <h2>Tomorrow</h2>
+                    #printItems( $tasks.tomorrow )
+                </section>
+            #end
+
+            #if ( $tasks.hasRegularTasks() )
+                <section class="tasks">
+                    #printItems( $tasks.regularTasks )
+                </section>
+            #end
+
+        #else
+            <p class="error">No tasks found</p>
+        #end
+
+#parse( "footer.vm" )

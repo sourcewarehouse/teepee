@@ -1,0 +1,9 @@
+    </div>
+
+    <footer>
+        <p class="label label-info">Generated on $timestamp.</p>
+    </footer>
+
+  </body>
+</html>
+
